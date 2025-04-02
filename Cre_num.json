@@ -1,0 +1,607 @@
+{
+  "name": "Projet Créa numérique",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "5fca442c-fbde-4145-8189-f7bfd476fdc7",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        -365
+      ],
+      "id": "b902d89b-17c3-4bc4-ba08-859e831bc8b6",
+      "name": "Webhook",
+      "webhookId": "5fca442c-fbde-4145-8189-f7bfd476fdc7"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1YaaltNCiczbLQC9dBAYoyOokmB-_6DNqPGuTSve4E04",
+          "mode": "list",
+          "cachedResultName": "Historique",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YaaltNCiczbLQC9dBAYoyOokmB-_6DNqPGuTSve4E04/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Feuille 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YaaltNCiczbLQC9dBAYoyOokmB-_6DNqPGuTSve4E04/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Adresse email de l’expéditeur": "={{ $('Webhook').item.json.body.sender_email }}",
+            "Contenu de l’email initial": "={{ $('Webhook').item.json.body.email_content }}",
+            "Réponse générée par l’IA": "={{ $json.text }}",
+            "Date de réception": "={{ $('Formatage Date + ID ').item.json.dateTraitement }}",
+            "Email ID": "={{ $('Formatage Date + ID ').item.json.emailId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date de réception",
+              "displayName": "Date de réception",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Adresse email de l’expéditeur",
+              "displayName": "Adresse email de l’expéditeur",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contenu de l’email initial",
+              "displayName": "Contenu de l’email initial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Réponse générée par l’IA",
+              "displayName": "Réponse générée par l’IA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email ID",
+              "displayName": "Email ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        496,
+        -65
+      ],
+      "id": "550cb672-ff80-4a28-9082-692acbf778db",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TP4tLZ7PqCBr3HjT",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook').item.json.body.email_content }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=📌 Paramètre de langue (important) :\nUtilise le contenu de {{ $json.body.email_content }} pour détecter la langue utilisée et emploie cette langue pour rédiger ta réponse.\n\n👤 Contexte :\nTu es un assistant français pour Murban, chargé de répondre aux emails des clients.\n\n⚙️ Instructions Générales :\n📂 Catégorisation des Emails Entrants :\nIl existe 4 catégories d'emails :\n\nDemandes d’informations sur les cours ou programmes proposés.\n\nProblèmes techniques rencontrés sur nos plateformes.\n\nQuestions administratives.\n\nRetours pédagogiques sur un élève / plaintes auprès d'une famille.\n\n🛠️ Gestion des Problèmes Techniques et Plaintes :\nSi l’email évoque un problème technique ou une plainte, commence par présenter des excuses pour l'incident et indique que tu es en train de chercher à y remédier.\n\n🙋‍♂️ Salutations Personnalisées :\nCommence l’email par « Hello [Prénom] », en récupérant le prénom à partir de l’adresse email du webhook :\n{{ $('Webhook').item.json.body.sender_email }}\net en déduisant le prénom du destinataire.\n\n✍️ Style de Rédaction :\nRédige le mail avec une tonalité conviviale et professionnelle.\n👉 Par exemple, préfère « Chez Murban, nous proposons… » plutôt que « Nous proposons… »\n\n📥 Analyse du contenu de l’email reçu :\nSi le mail porte sur un service spécifique (babysitting éducatif, cours de musique, tutorat, etc.), concentre ta réponse uniquement sur ce service.\n\nSi le mail est général ou aborde plusieurs sujets, présente brièvement la mission et les services de Murban (tutorat, babysitting, cours de musique, etc.) et réponds de manière globale mais concise.\n\n✅ Pertinence de la Demande :\nAnalyse les services que Murban propose et vérifie si la demande du client correspond à l’un d’eux.\nSi ce n’est pas le cas, présente des excuses et explique que Murban ne propose pas ce type de service.\n\n💬 Réponse à la demande :\nRéponds de manière claire, concise et professionnelle à la demande spécifique du destinataire.\n\n🤝 Conclusion et Invitation à Échanger :\nTermine l’email en proposant un rendez-vous ou un échange pour approfondir la discussion.\n\n🎨 Mise en Forme et Émojis :\nPas de mots en gras ni de **texte en astérisques**.\n\nStructure claire avec des alinéas et paragraphes aérés.\n\nUtilise quelques émojis pertinents et chaleureux, sans excès.\n\nSuggestions d’émojis selon le contexte :\n\nÉducation et Apprentissage : 📚 🎓 🧑‍🏫 🧒\nCommunication et Support : 📧 📞 🤝\nMusique : 🎵 🎸\nPositivité : 😊 👍 🎉\nLocalisation / à domicile : 📍 🏠\nTechnologie / en ligne : 💻 🌐\n\n✍️ Signature :\nAprès une formule de clôture comme « Bien cordialement », ne signe pas toi-même.\nLaisse un espace pour que la signature habituelle soit ajoutée automatiquement.\n👉 Ne pas inclure de signature supplémentaire.\n\n"
+            },
+            {
+              "message": "={{ $('Webhook').item.json.body.sender_email }}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        120,
+        -40
+      ],
+      "id": "fa02698e-1862-4295-8fc2-68428f16ad47",
+      "name": "Basic LLM Chain",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": "mistral-large-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        208,
+        180
+      ],
+      "id": "c4fafca3-61b9-41a2-9398-6232c6f61050",
+      "name": "Mistral Cloud Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "nN7X4qpiN2i0v6xs",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appKCHF9KwdWa412k",
+          "mode": "list",
+          "cachedResultName": "Historique_Mails",
+          "cachedResultUrl": "https://airtable.com/appKCHF9KwdWa412k"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblg4BvZV5MUXKmko",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appKCHF9KwdWa412k/tblg4BvZV5MUXKmko"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Contenu de l’email initial": "={{ $('Webhook').item.json.body.email_content }}",
+            "Adresse email de l’expéditeur": "={{ $('Webhook').item.json.body.sender_email }}",
+            "Objet": "={{ $('Webhook').item.json.body.subject }}",
+            "Date de réception": "={{ $('Formatage Date + ID ').item.json.dateTraitement }}",
+            "Email ID": "={{ $('Formatage Date + ID ').item.json.emailId }}",
+            "Réponse générée par l’IA": "={{ $json.text }}",
+            "Status": "Todo"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Email ID",
+              "displayName": "Email ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date de réception",
+              "displayName": "Date de réception",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Adresse email de l’expéditeur",
+              "displayName": "Adresse email de l’expéditeur",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Objet",
+              "displayName": "Objet",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Contenu de l’email initial",
+              "displayName": "Contenu de l’email initial",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Réponse générée par l’IA",
+              "displayName": "Réponse générée par l’IA",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Collaborateur",
+              "displayName": "Collaborateur",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        496,
+        135
+      ],
+      "id": "67c0bf94-c141-4619-8ce6-36d12c0ada4c",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "LDiPcku8BZsajPIy",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Formatage Date + ID ').first().json.body.sender_email }}",
+        "subject": "={{ $('Webhook').first().json.body.subject }}",
+        "bodyContent": "={{ $('Mail + Signature').item.json.finalHtml }}",
+        "additionalFields": {
+          "bodyContentType": "html"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1380,
+        -420
+      ],
+      "id": "54d27368-2d9b-4209-b1a6-cfec8d0ab2d8",
+      "name": "Microsoft Outlook",
+      "webhookId": "5f838a08-fb36-435b-b477-8b86d61bd3f0",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "SvsdBdHhmCj7SycC",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        496,
+        -315
+      ],
+      "id": "e0317800-917c-404e-a8da-8e86226b93d7",
+      "name": "Merge",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "mergeKey",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1156,
+        -415
+      ],
+      "id": "66526c18-de46-4462-8c35-09dfcc591c7e",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Récupère tous les items en entrée (les deux items attendus : un avec le texte et un avec la signature)\nconst inputs = $input.all();\n\nlet plainText = \"\";\nlet signatureHtml = \"\";\n\ninputs.forEach(item => {\n  if (item.json.text !== undefined) {\n    plainText = String(item.json.text);\n  }\n  if (item.json.html !== undefined) {\n    signatureHtml = item.json.html;\n  }\n});\n\n// Convertir le texte brut en HTML en remplaçant les retours à la ligne par <br>\nconst textHtml = `<p>${plainText.split('\\n').join('<br>')}</p>`;\n\n// Fusionner le texte converti et la signature\nconst finalHtml = textHtml + signatureHtml;\n\n// Retourner un seul item avec la propriété \"finalHtml\"\nreturn [\n  {\n    json: {\n      finalHtml\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        716,
+        -315
+      ],
+      "id": "b54b176e-3d22-4797-ac43-787922980d1d",
+      "name": "Mail + Signature"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const data = item.json;\n\n  // Générer un ID unique pour l'email\n  const uniqueId = `email-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;\n  data.emailId = uniqueId;\n\n  // Créer un nouvel objet Date pour la date/heure actuelle\n  const dateObj = new Date();\n\n  // Formater la date en \"dd/mm/yyyy hh:mm:ss\"\n  const day = String(dateObj.getDate()).padStart(2, '0');\n  const month = String(dateObj.getMonth() + 1).padStart(2, '0');\n  const year = dateObj.getFullYear();\n  const hours = String(dateObj.getHours()).padStart(2, '0');\n  const minutes = String(dateObj.getMinutes()).padStart(2, '0');\n  const seconds = String(dateObj.getSeconds()).padStart(2, '0');\n\n  data.dateTraitement = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;\n\n  // Retourne l'item avec la date formatée et l'ID généré\n  return {\n    json: data\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        -40
+      ],
+      "id": "4e6f8161-c0e3-48af-b41d-24862a2a4a4b",
+      "name": "Formatage Date + ID "
+    },
+    {
+      "parameters": {
+        "html": "<div style='font-family: Arial, sans-serif; display: flex; align-items: center;'>\n    <div style='text-align: center; margin-right: 20px;'>\n        <img src='https://media-hosting.imagekit.io/a06118fff4b649c3/screenshot_1743618419893.png?Expires=1838226420&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=1eQU9o28Ppt4s0hSc8ng5fMdn6oXpHNiAwe6XgS1y8W8mofY8Dqyixlz0d6CxfvnDb7ey-kUTsaqBRBL9kKllpl0N~2h4c2aXZHArSCEaVT3TQbWBfsgwbDa5egwAuR-Ar8GBa-5ujsQOgRb6gRNh7XDhzzdk5qqjzPhimij975CgzccvaJ8o2QqJNZH4AOqRlKneQza-Jzyp2PBUPDGs~JtbRECYoHecyO7PA8dKgE76RgnGyhfkffxQ2zg4jY30FcpsBg2CO91fSvidpZhUA2PoWY7rspHY7fEgPb2Rt05T41a~RMTUGZVa0NdCVIvWrNREXByiDT4PpqZhe~m-Q__' alt='Photo' style='border-radius: 50%; width: 100px; height: 100px;'>\n    </div>\n    <div style='text-align: left; flex: 1;'>\n        <h2>Tom Urban</h2>\n        <p>Fondateur | Murban</p>\n        <p><img src='https://www.mail-signatures.com/signature-generator/img/templates/modern-all-inclusive/phone-icon.png' alt='Phone' style='width: 15px; vertical-align: middle;'> +33 6.95.97.86.20</p>\n        <p><img src='https://www.mail-signatures.com/signature-generator/img/templates/modern-all-inclusive/email-icon.png' alt='Email' style='width: 15px; vertical-align: middle;'> tom.urban@edu.ece.fr</p>\n        <p><img src='https://www.mail-signatures.com/signature-generator/img/templates/modern-all-inclusive/address-icon.png' alt='Location' style='width: 15px; vertical-align: middle;'> 26 Rue des Tournelles, 75004, Paris</p>\n        <p><img src='https://www.mail-signatures.com/signature-generator/img/templates/modern-all-inclusive/website-icon.png' alt='Website' style='width: 15px; vertical-align: middle;'> www.Murban.fr</p>\n    </div>\n</div>\n<div style='text-align: center; margin-top: 20px;'>\n    <a href='https://github.com/TomGit8'><img src='https://media-hosting.imagekit.io/a06118fff4b649c3/screenshot_1743618419893.png?Expires=1838226420&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=1eQU9o28Ppt4s0hSc8ng5fMdn6oXpHNiAwe6XgS1y8W8mofY8Dqyixlz0d6CxfvnDb7ey-kUTsaqBRBL9kKllpl0N~2h4c2aXZHArSCEaVT3TQbWBfsgwbDa5egwAuR-Ar8GBa-5ujsQOgRb6gRNh7XDhzzdk5qqjzPhimij975CgzccvaJ8o2QqJNZH4AOqRlKneQza-Jzyp2PBUPDGs~JtbRECYoHecyO7PA8dKgE76RgnGyhfkffxQ2zg4jY30FcpsBg2CO91fSvidpZhUA2PoWY7rspHY7fEgPb2Rt05T41a~RMTUGZVa0NdCVIvWrNREXByiDT4PpqZhe~m-Q__' alt='Logo Murban' style='width: 150px;'></a>\n</div>\n<div style='text-align: center; margin-top: 10px;'>\n    <a href='https://www.facebook.com/Murban/'><img src='https://www.mail-signatures.com/signature-generator/img/templates/modern-all-inclusive/fb.png' alt='Facebook' style='width: 20px; margin: 0 5px;'></a>\n    <a href='https://www.youtube.com/watch?v=R6Tt5T5-_gM'><img src='https://www.mail-signatures.com/signature-generator/img/templates/modern-all-inclusive/yt.png' alt='YouTube' style='width: 20px; margin: 0 5px;'></a>\n    <a href='https://www.linkedin.com/in/tom-urban-60a5781b1/'><img src='https://www.mail-signatures.com/signature-generator/img/templates/modern-all-inclusive/ln.png' alt='LinkedIn' style='width: 20px; margin: 0 5px;'></a>\n    <a href='https://www.instagram.com/tom_urbn.fr'><img src='https://www.mail-signatures.com/signature-generator/img/templates/modern-all-inclusive/it.png' alt='Instagram' style='width: 20px; margin: 0 5px;'></a>\n</div>\"\n"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        198,
+        -365
+      ],
+      "id": "cafaab25-d3e1-4eb9-9759-fc65fc8f6ab8",
+      "name": "Signature HTML"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cd25b64d-0b98-4f41-a8b7-cf1adcce990c",
+              "name": "mergeKey",
+              "value": "unique",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        936,
+        -540
+      ],
+      "id": "704413d3-384a-4c12-b378-cbf88f173497",
+      "name": "Setup pour merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "204bddaf-cdb6-4bb9-b601-e281616672b2",
+              "name": "mergeKey",
+              "value": "unique",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        936,
+        -315
+      ],
+      "id": "4738f24b-98bf-4a28-9def-5ce25cf48079",
+      "name": "Setup pour merge1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Formatage Date + ID ",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Signature HTML",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Setup pour merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        []
+      ]
+    },
+    "Microsoft Outlook": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Mail + Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Microsoft Outlook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mail + Signature": {
+      "main": [
+        [
+          {
+            "node": "Setup pour merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatage Date + ID ": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Signature HTML": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Setup pour merge": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Setup pour merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "any"
+  },
+  "versionId": "9187b7ca-fafc-480d-8e3b-21aeb767fd40",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0975c6864ca44d30f4fd585f70e3b61b52a05d32fa0b923ea9795884de3fc6d3"
+  },
+  "id": "ZnzpCre9w3kYgpve",
+  "tags": []
+}
